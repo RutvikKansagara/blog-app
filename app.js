@@ -29,6 +29,13 @@ app.use("/uploads",express.static("uploads"));
 app.use("/api/users",userRoutes);
 app.use("/api/blogs",blogRoutes);
 
+
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+
+  // Send a generic error response to the client
+  res.status(500).send('Something went wrong!');
+});
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT,()=>{
