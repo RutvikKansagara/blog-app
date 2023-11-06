@@ -8,10 +8,12 @@ const path = require("path");
 
 const userRoutes = require("./routes/userRoutes");
 const blogRoutes = require("./routes/blogRoutes");
+const { cloudinaryConfig } = require("./utils/cloudnaryConfig");
 
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 app.use(cors());
+app.use("*", cloudinaryConfig);
 
 // Set up CORS to allow only specific origins
 // const corsOptions = {
@@ -24,11 +26,6 @@ app.use(cors());
 
 connectToMongoDb();
 
-// Assuming your images are in the "uploads" folder inside the "tmp" folder
-const uploadsPath = path.join(__dirname, 'tmp', 'uploads');
-
-// Serve static files from the "uploads" folder
-app.use('/uploads', express.static(uploadsPath));
 
 app.use("/api/users",userRoutes);
 app.use("/api/blogs",blogRoutes);

@@ -4,6 +4,8 @@ const mongoose = require("mongoose");
 const isAuthenticated = require("../middlewares/isAuthenticated");
 const blogValidation = require("../utils/blogValidation");
 const fs = require("fs");
+const getDatauri = require("../utils/datauri");
+const { uploader } = require("../utils/cloudnaryConfig");
 const createBlog = [
     isAuthenticated,blogValidation,
     async (req, res) => {
@@ -12,19 +14,24 @@ const createBlog = [
         const { title, content } = req.body;
         console.log("blogImage",req.file);
         try {
+            let blogImage;
+        if (req?.file) {
+            const file = getDatauri(req.file);
+            const uploadFile = await uploader.upload(file.content);
+            blogImage = uploadFile.secure_url;
+          }
             const newBlog = await Blog.create({
                 user: userId,
                 title,
                 content,
-                ...(req.file ? { blogImage: req.file.path.replace(/\\/g, "/") } : {}),
+                blogImage: blogImage
             });
 
             res.status(201).json({
                 status: "success",
                 message: "Blog created successfully",
                 newBlog,
-                blogUrl: `${process.env.BASE_URL}api/blogs/${newBlog.id}/${newBlog.user}`,
-                blogImageUrl: `${process.env.BASE_URL}${newBlog.blogImage}`,
+                
             });
         } catch (error) {
             console.log(error);
@@ -52,19 +59,19 @@ const getAllBlogsOfLoggedInUser = [
                     status: "success",
                     message:
                         "you have not created any blogs you can create blogs by using below url",
-                    createBlogUrl: `${process.env.BASE_URL}api/blog/create`,
+                    
                 });
             }
             const blogsWithAuthor = blogs.map(blog => ({
                 _id: blog._id,
                 title: blog.title,
                 content: blog.content,
-                blogImage: `${process.env.BASE_URL}${blog.blogImage}`,
+                blogImage: blog.blogImage,
                 createdAt: blog.createdAt,
                 user: {
                     _id: blog.user._id,
                     username: blog.user.username,
-                    pic: `${process.env.BASE_URL}${blog.user.pic}`
+                    pic: blog.user.pic
                 },
             }));
             return res.status(200).json({
@@ -101,7 +108,7 @@ const getBlogById = [
             const user = {
                 _id: blog.user._id,
                 username: blog.user.username,
-                pic: `${process.env.BASE_URL}${blog.user.pic}`
+                pic: blog.user.pic
             }
             if (!blog) {
                 return res
@@ -112,7 +119,7 @@ const getBlogById = [
                 status: "success",
                 message: "blog details fetched successfully",
                 blog,
-                blogImageUrl: `${process.env.BASE_URL}${blog.blogImage}`,
+                blogImageUrl: blog.blogImage,
                 user
             });
         } catch (error) {
@@ -143,18 +150,15 @@ const editBlog = [
         try {
             const updates = req.body;
 
-            if (req.file) {
+            let blogImage;
+            if (req?.file) {
+                const file = getDatauri(req.file);
+                const uploadFile = await uploader.upload(file.content);
+                blogImage = uploadFile.secure_url;
+              }
+            
 
-                const existingBlog = await Blog.findOne({ user: userId, _id: blogId });
-
-
-                const imagePath = existingBlog.blogImage.replace(/\//g, "\\");
-                fs.unlinkSync(imagePath);
-
-
-
-                updates.blogImage = req.file.path.replace(/\\/g, "/");
-            }
+            updates.pic = blogImage;
 
             const blog = await Blog.findOneAndUpdate(
                 { user: userId, _id: blogId },
@@ -254,12 +258,12 @@ const getAllBlogs = [
                 _id: blog._id,
                 title: blog.title,
                 content: blog.content,
-                blogImage: `${process.env.BASE_URL}${blog.blogImage}`,
+                blogImage: blog.blogImage,
                 createdAt: blog.createdAt,
                 user: {
                     _id: blog.user._id,
                     username: blog.user.username,
-                    pic: `${process.env.BASE_URL}${blog.user.pic}`
+                    pic: blog.user.pic
                 },
             }));
             return res.status(200).json({
@@ -296,12 +300,12 @@ const searchBlogs = [
                 _id: blog._id,
                 title: blog.title,
                 content: blog.content,
-                blogImage: `${process.env.BASE_URL}${blog.blogImage}`,
+                blogImage: blog.blogImage,
                 createdAt: blog.createdAt,
                 user: {
                     _id: blog.user._id,
                     username: blog.user.username,
-                    pic: `${process.env.BASE_URL}${blog.user.pic}`
+                    pic: blog.user.pic
                 },
             }));
 

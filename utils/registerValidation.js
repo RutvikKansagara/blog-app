@@ -1,6 +1,7 @@
-const registerValidation = (req,res,next) => {
-  const {username,email,password,confirmpassword} = req.body;
-    // Check if username, email, and password are provided
+const registerValidation = (req, res, next) => {
+  const { username, email, password, confirmpassword } = req.body;
+
+  // Check if username, email, and password are provided
   if (!username || !email || !password) {
     return res.status(400).json({ message: "Please fill all the fields" });
   }
@@ -22,11 +23,11 @@ const registerValidation = (req,res,next) => {
     });
   }
 
-  if(password !== confirmpassword){
-    
+  if (password !== confirmpassword) {
+
     return res.status(400).json({
-      status:"error",
-      message:"password mismatch"
+      status: "error",
+      message: "password mismatch"
     })
   }
   next();

@@ -6,21 +6,19 @@ const generateToken = require("../config/generateToken");
 const isAuthenticated = require("../middlewares/isAuthenticated");
 const registerValidation = require("../utils/registerValidation");
 const loginValidation = require("../utils/loginValidation");
+const getDatauri = require("../utils/datauri");
+const { uploader } = require("../utils/cloudnaryConfig");
 
 
 
 
 
 const register =
-    [registerValidation,async (req, res) => {
-
-        
-
+    [registerValidation, async (req, res) => {
+        console.log(req.body);
         const { username, email, password } = req.body;
-        
-        if (!username || !email || !password) {
-            return res.status(400).json({ message: "please fill all the fields" });
-        }
+
+
         const user = await User.findOne({ email: email });
         if (user) {
             return res
@@ -28,20 +26,26 @@ const register =
                 .json({ message: "use unique email. user found with this email" });
         }
         try {
+            console.log("req.file is:", req.file);
+            let userImage;
+            if (req?.file) {
+                const file = getDatauri(req.file);
+                const uploadFile = await uploader.upload(file.content);
+                userImage = uploadFile.secure_url;
+            }
             const hashedPassword = await hashPassword(password);
 
             const newUser = await User.create({
                 username,
                 email,
                 password: hashedPassword,
-                ...(req.file ? { pic: req.file.path.replace(/\\/g, "/") } : {}),
+                pic: userImage
             });
 
             res.status(201).json({
                 status: "success",
                 message: "User created successfully",
                 user: newUser,
-                imageUrl: `${process.env.BASE_URL}${newUser.pic}`,
             });
         } catch (error) {
             console.log(error);
@@ -51,10 +55,10 @@ const register =
 
 
 const login =
-    [loginValidation,async (req, res) => {
+    [loginValidation, async (req, res) => {
 
         const { email, password } = req.body;
-        
+
         const user = await User.findOne({ email: email });
         if (!user) {
             return res.status(404).json({
@@ -150,7 +154,7 @@ const getUserDetails = [
                 status: "success",
                 message: "successfully fetched details",
                 user_details: user,
-                userImageUrl:`${process.env.BASE_URL}${user.pic}`
+                userImageUrl: user.pic
             });
         } catch (error) {
             console.log(error);
@@ -171,14 +175,15 @@ const updateUserDetails = [
         }
         try {
             const updates = req.body;
-
-            if (req.file) {
-                const existingUser = await User.findOne({ _id: userId });
-                const imagePath = existingUser.pic.replace(/\//g, "\\");
-                fs.unlinkSync(imagePath);
+            let userImage;
+            if (req?.file) {
+                const file = getDatauri(req.file);
+                const uploadFile = await uploader.upload(file.content);
+                userImage = uploadFile.secure_url;
             }
 
-            updates.pic = req.file.path.replace(/\\/g, "/");
+
+            updates.pic = userImage;
 
             // If the updates include a new password, hash it
             if (updates.password) {
@@ -197,18 +202,18 @@ const updateUserDetails = [
     },
 ];
 
- 
+
 
 // Logout route
-const logout = [isAuthenticated,async (req, res) => {
-    
+const logout = [isAuthenticated, async (req, res) => {
+
     res.setHeader('Authorization', '');
-  
-    
-  
+
+
+
     res.json({ message: 'Logout successful' });
-  }];
-  
+}];
+
 
 
 

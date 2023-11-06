@@ -17,31 +17,7 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const uploadPath = path.join("/tmp", "uploads");
-    const blogPath = path.join(uploadPath, "blogs");
-
-    console.log("Upload Path:", uploadPath);
-    console.log("Blog Path:", blogPath);
-    // Create the 'uploads' directory if it doesn't exist
-    if (!fs.existsSync(uploadPath)) {
-      fs.mkdirSync(uploadPath, { recursive: true });
-    }
-
-    // Create the 'blogs' directory if it doesn't exist
-    if (!fs.existsSync(blogPath)) {
-      fs.mkdirSync(blogPath, { recursive: true });
-    }
-
-    // Use the 'blogs' directory as the destination
-    cb(null, blogPath);
-  },
-  filename: function (req, file, cb) {
-    console.log(file.originalname.replace(/\\/g, "/"));
-    cb(null, file.originalname.replace(/\\/g, "/"));
-  },
-});
+const storage = multer.memoryStorage();
 const fileFilter = (req, file, cb) => {
   //reject a file
   if (file.mimetype === "image/jpeg" || file.mimetype === "image/png" || file.mimetype === "image/jpg") {
