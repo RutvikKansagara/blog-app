@@ -19,8 +19,8 @@ const path = require("path");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const uploadPath = path.join(__dirname, "../uploads/");
-    const blogPath = path.join(uploadPath, "../uploads/blogs/");
+    const uploadPath = path.join(__dirname, "uploads");
+    const blogPath = path.join(uploadPath, "blogs");
 
 
     // Create the 'uploads' directory if it doesn't exist
