@@ -13,18 +13,11 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 app.use(cors());
 
-// Set up CORS to allow only specific origins
-// const corsOptions = {
-//     origin: "http://localhost:3000", 
-//     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-//     credentials: true, 
-//     optionsSuccessStatus: 204, 
-//   };
-// app.use(cors(corsOptions));
+
 
 connectToMongoDb();
 
-app.use("/uploads",express.static("uploads"));
+app.use("/uploads",express.static("/tmp/uploads"));
 
 app.use("/api/users",userRoutes);
 app.use("/api/blogs",blogRoutes);
