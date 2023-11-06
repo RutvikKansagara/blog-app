@@ -17,7 +17,11 @@ app.use(cors());
 
 connectToMongoDb();
 
-app.use("/tmp",express.static("/tmp"));
+app.use("/tmp",express.static("uploads"));
+
+
+// Add the following line to serve static files from the '/tmp' path
+app.use("/tmp", express.static("uploads"));
 
 app.use("/api/users",userRoutes);
 app.use("/api/blogs",blogRoutes);
