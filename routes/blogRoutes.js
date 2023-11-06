@@ -22,7 +22,8 @@ const storage = multer.diskStorage({
     const uploadPath = path.join(__dirname, "../uploads");
     const blogPath = path.join(uploadPath, "blogs");
 
-
+    console.log("Upload Path:", uploadPath);
+    console.log("Blog Path:", blogPath);
     // Create the 'uploads' directory if it doesn't exist
     if (!fs.existsSync(uploadPath)) {
       fs.mkdirSync(uploadPath, { recursive: true });
