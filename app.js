@@ -13,15 +13,22 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 app.use(cors());
 
-
+// Set up CORS to allow only specific origins
+// const corsOptions = {
+//     origin: "http://localhost:3000", 
+//     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+//     credentials: true, 
+//     optionsSuccessStatus: 204, 
+//   };
+// app.use(cors(corsOptions));
 
 connectToMongoDb();
 
-// Serve static files from the 'uploads' directory
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// Assuming your images are in the "uploads" folder inside the "tmp" folder
+const uploadsPath = path.join(__dirname, 'tmp', 'uploads');
 
-// Serve static files from the '/tmp/uploads' directory
-app.use("/tmp/uploads", express.static(path.join(__dirname, "/tmp/uploads")));
+// Serve static files from the "uploads" folder
+app.use('/uploads', express.static(uploadsPath));
 
 app.use("/api/users",userRoutes);
 app.use("/api/blogs",blogRoutes);
