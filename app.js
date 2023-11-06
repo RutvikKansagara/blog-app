@@ -17,7 +17,7 @@ app.use(cors());
 
 connectToMongoDb();
 
-app.use("/uploads",express.static("/tmp/uploads"));
+app.use("/tmp",express.static("/tmp"));
 
 app.use("/api/users",userRoutes);
 app.use("/api/blogs",blogRoutes);
