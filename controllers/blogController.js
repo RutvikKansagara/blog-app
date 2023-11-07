@@ -163,7 +163,7 @@ const editBlog = [
                 { user: userId, _id: blogId },
                 {
                     $set:{
-                        pic:blogImage,
+                        blogImage:blogImage,
                         updates
                     }
                 },
