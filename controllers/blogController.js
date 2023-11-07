@@ -158,11 +158,15 @@ const editBlog = [
               }
             
 
-            updates.pic = blogImage;
-
+            
             const blog = await Blog.findOneAndUpdate(
                 { user: userId, _id: blogId },
-                updates,
+                {
+                    $set:{
+                        pic:blogImage,
+                        updates
+                    }
+                },
                 { new: true }
             );
             return res
