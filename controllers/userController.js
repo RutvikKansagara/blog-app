@@ -207,11 +207,15 @@ const updateUserDetails = [
 // Logout route
 const logout = [isAuthenticated, async (req, res) => {
 
-    res.setHeader('Authorization', '');
 
 
+    try {
+        req.headers.authorization = "";
+        res.status(201).json("Logout successfully");
+    } catch (e) {
+        return res.status(401).json(e);
+    }
 
-    res.json({ message: 'Logout successful' });
 }];
 
 
